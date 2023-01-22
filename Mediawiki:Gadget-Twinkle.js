@@ -109,9 +109,9 @@ Twinkle.defaultConfig = {
 	watchSpeedyUser: '1 month',
 
 	// these next two should probably be identical by default
-	welcomeUserOnSpeedyDeletionNotification: [ 'db', 'g1', 'g2', 'g3', 'g4', 'g6', 'g10', 'g11', 'g12', 'g13', 'g14', 'a1', 'a2', 'a3', 'a5', 'a7', 'a9', 'a10', 'a11', 'f1', 'f2', 'f3', 'f7', 'f9', 'f10', 'u3', 'u5', 'p1', 'p2' ],
-	notifyUserOnSpeedyDeletionNomination: [ 'db', 'g1', 'g2', 'g3', 'g4', 'g6', 'g10', 'g11', 'g12', 'g13', 'g14', 'a1', 'a2', 'a3', 'a5', 'a7', 'a9', 'a10', 'a11', 'f1', 'f2', 'f3', 'f7', 'f9', 'f10', 'u3', 'u5', 'p1', 'p2' ],
-	warnUserOnSpeedyDelete: [ 'db', 'g1', 'g2', 'g3', 'g4', 'g6', 'g10', 'g11', 'g12', 'g13', 'g14', 'a1', 'a2', 'a3', 'a5', 'a7', 'a9', 'a10', 'a11', 'f1', 'f2', 'f3', 'f7', 'f9', 'f10', 'u3', 'u5', 'p1', 'p2' ],
+	welcomeUserOnSpeedyDeletionNotification: [ 'db', 'g1', 'g2', 'g3', 'g4', 'g6', 'g10', 'g11', 'g12', 'g13', 'g14', 'a1', 'a2', 'a3', 'a5', 'a7', 'a9', 'a10', 'a11', 'f1', 'f2', 'f3', 'f7', 'f9', 'f10', 'r3', 'u5', 'p1', 'p2' ],
+	notifyUserOnSpeedyDeletionNomination: [ 'db', 'g1', 'g2', 'g3', 'g4', 'g6', 'g10', 'g11', 'g12', 'g13', 'g14', 'a1', 'a2', 'a3', 'a5', 'a7', 'a9', 'a10', 'a11', 'f1', 'f2', 'f3', 'f7', 'f9', 'f10', 'r3', 'u5', 'p1', 'p2' ],
+	warnUserOnSpeedyDelete: [ 'db', 'g1', 'g2', 'g3', 'g4', 'g6', 'g10', 'g11', 'g12', 'g13', 'g14', 'a1', 'a2', 'a3', 'a5', 'a7', 'a9', 'a10', 'a11', 'f1', 'f2', 'f3', 'f7', 'f9', 'f10', 'r3', 'u5', 'p1', 'p2' ],
 	promptForSpeedyDeletionSummary: [],
 	deleteTalkPageOnDelete: true,
 	deleteRedirectsOnDelete: true,
@@ -290,7 +290,16 @@ Twinkle.addPortlet = function(navigation, id, text, type, nextnodeid) {
 			if (navigation !== 'portal' && navigation !== 'left-navigation' && navigation !== 'right-navigation') {
 				navigation = 'mw-panel';
 			}
-			outerNavClass = 'mw-portlet vector-menu vector-menu-' + (navigation === 'mw-panel' ? 'portal' : type === 'menu' ? 'dropdown vector-menu-dropdown-noicon' : 'tabs');
+
+			outerNavClass = 'mw-portlet vector-menu';
+			if (navigation === 'mw-panel') {
+				outerNavClass += ' vector-menu-portal';
+			} else if (type === 'menu') {
+				outerNavClass += ' vector-menu-dropdown vector-dropdown vector-menu-dropdown-noicon';
+			} else {
+				outerNavClass += ' vector-menu-tabs';
+			}
+
 			innerDivClass = 'vector-menu-content';
 			break;
 		case 'modern':
@@ -318,6 +327,7 @@ Twinkle.addPortlet = function(navigation, id, text, type, nextnodeid) {
 		outerNav = document.createElement('nav');
 		heading = document.createElement('h3');
 	}
+
 	outerNav.setAttribute('aria-labelledby', id + '-label');
 	outerNav.className = outerNavClass + ' emptyPortlet';
 	outerNav.id = id;
@@ -331,7 +341,7 @@ Twinkle.addPortlet = function(navigation, id, text, type, nextnodeid) {
 	var ul = document.createElement('ul');
 
 	if (skin === 'vector' || skin === 'vector-2022') {
-		ul.className = 'vector-menu-content-list';
+		ul.className = 'menu vector-menu-content-list mm-menu';
 		heading.className = 'vector-menu-heading';
 
 		// add invisible checkbox to keep menu open when clicked
@@ -374,11 +384,8 @@ Twinkle.addPortlet = function(navigation, id, text, type, nextnodeid) {
 		outerNav.appendChild(ul);
 	}
 
-
 	return outerNav;
-
 };
-
 
 /**
  * **************** Twinkle.addPortletLink() ****************
@@ -500,6 +507,12 @@ Twinkle.load = function () {
 	var isVector = mw.config.get('skin') === 'vector' || mw.config.get('skin') === 'vector-2022';
 	if (isVector && Twinkle.getPref('portletType') === 'menu' && $('#p-twinkle').length === 0) {
 		$('#p-cactions').css('margin-right', 'initial');
+	}
+
+	// If using a skin with space for lots of modules, display a link to Twinkle Preferences
+	var usingSkinWithDropDownMenu = mw.config.get('skin') === 'vector' || mw.config.get('skin') === 'vector-2022' || mw.config.get('skin') === 'timeless';
+	if (usingSkinWithDropDownMenu) {
+		Twinkle.addPortletLink(mw.util.getUrl('উইকিপিডিয়া:টুইংকল/পছন্দসমূহ'), 'পছন্দসমূহ', 'tw-config', 'টুইংকল পছন্দসমূহের পাতা খুলুন');
 	}
 };
 
